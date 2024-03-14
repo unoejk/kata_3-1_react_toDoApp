@@ -14,7 +14,7 @@ import TasksFilter from '../TasksFilter/TasksFilter'
 export default class extends React.Component{
     render() {return(
         <footer className="footer">
-            <span className="todo-count">1 items left</span>
+            <span className="todo-count">{this.props.countActiveTasks} items left</span>
             <ul className="filters">
                 <TasksFilter btnName={'All'} selected={'selected'}/>
                 <TasksFilter btnName={'Active'} selected={''}/>

@@ -1,6 +1,4 @@
 
-// ---- import
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -11,26 +9,126 @@ import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import Footer from '../Footer/Footer'
 
 
-// ---- go-go
-
-const genExTime=(ms)=>{
-    return new Date((new Date()).getTime()-ms)
-}
-
 export default class extends React.Component{
-    lastId=3
-    taskDataList=[
-        {id:1, quest:'Completed task', passTime:genExTime(1000*17), isCompleted:true},
-        {id:2, quest:'Editing task', passTime:genExTime(1000*60*5), isEditing:true},
-        {id:3, quest:'Active task', passTime:genExTime(1000*60*5)}
-    ]
+    lastId=0
+
+    genExTime=(ms)=>{   // делает дату на заданное количество ms позже
+        return new Date((new Date()).getTime()-ms)
+    }
+
+    createTask=(quest,msPassed)=>{
+        return {
+            id:this.lastId++,
+            quest:quest,
+            time:msPassed
+                ?this.genExTime(msPassed)
+                :new Date(),
+            isCompleted:false,
+            isEditing:false
+        }
+    }
+
+    state={
+        taskDataList:[
+            this.createTask('Completed task',1000*17),
+            this.createTask('Editing task',1000*60*5),
+            this.createTask('Active task',1000*60*5)
+        ]
+    }
+
+
+    // ---------------- forNewTaskForm
+
+    addTask=(quest)=>{
+        const newTask=this.createTask(quest)
+        const newTaskDataList=[...this.state.taskDataList,newTask]
+        this.setState({
+            taskDataList:newTaskDataList
+        })
+    }
+
+
+    // ---------------- forTaskList
+
+    // completeTask=(id)=>{
+    //     // console.log('hi')
+    //     this.setState((state)=>{
+    //         const newTaskDataList=state.taskDataList.slice()
+    //         const taskPosition=newTaskDataList.findIndex(val=>val.id===id)
+    //         const newMark=!newTaskDataList[taskPosition].isCompleted
+    //         newTaskDataList[taskPosition].isCompleted=newMark
+    //         // console.log(newTaskDataList[taskPosition].isCompleted)
+    //         // console.log(newTaskDataList[taskPosition])
+    //         // console.log(newTaskDataList)
+    //         return{
+    //             taskDataList:newTaskDataList
+    //         }
+    //     })
+    // }
+    // completeTask=(id)=>{
+    //     const newTaskDataList=this.state.taskDataList.slice()
+    //     const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
+    //     const newMark=!newTaskDataList[taskPosition].isCompleted
+    //     newTaskDataList[taskPosition].isCompleted=newMark
+    //     this.setState({
+    //         taskDataList:newTaskDataList
+    //     })
+    // }
+    completeTask=(id,isCompleted)=>{
+        const newTaskDataList=this.state.taskDataList.slice()
+        const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
+        newTaskDataList[taskPosition].isCompleted=!isCompleted
+        this.setState({
+            taskDataList:newTaskDataList
+        })
+    }
+
+    changeTask=(id,newQuest)=>{
+        const newTaskDataList=this.state.taskDataList.slice()
+        const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
+        newTaskDataList[taskPosition].quest=newQuest
+        this.setState({
+            taskDataList:newTaskDataList
+        })
+    }
+
+    removeTask=(id)=>{
+        const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
+        const before=this.state.taskDataList.slice(0,taskPosition)
+        const after=this.state.taskDataList.slice(taskPosition+1)
+        const newTaskDataList=[...before,...after]
+        this.setState({
+            taskDataList:newTaskDataList
+        })
+    }
+
+
+    // ---------------- forFooter
+
+    calcActiveTasks=()=>{
+        return this.state.taskDataList
+            .filter(val=>!val.isCompleted)
+            .length
+    }
+
+
+    // ---------------- go-go
 
     render() {return(
         <section className="todoapp">
-            <NewTaskForm/>
+            <NewTaskForm
+                addTask={this.addTask}
+            />
             <section className="main">
-                <TaskList taskDataList={this.taskDataList}/>
-                <Footer/>
+                <TaskList
+                    taskDataList={this.state.taskDataList}
+                    completeTask={this.completeTask}
+                    changeTask={this.changeTask}
+                    removeTask={this.removeTask}
+                />
+                <Footer
+                    countActiveTasks={this.calcActiveTasks()}
+                />
             </section>
         </section>
     )}
