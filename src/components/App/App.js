@@ -114,16 +114,16 @@ export default class extends React.Component{
 
     // ---------------- forFooter
 
-    changeFilter=(newFilter)=>{
-        this.setState({
-            activeFilter:newFilter
-        })
-    }
-
     calcActiveTasks=()=>{
         return this.state.taskDataList
             .filter(val=>!val.isCompleted)
             .length
+    }
+
+    changeFilter=(newFilter)=>{
+        this.setState({
+            activeFilter:newFilter
+        })
     }
 
     clearCompletedTasks=()=>{
@@ -149,10 +149,10 @@ export default class extends React.Component{
                     removeTask={this.removeTask}
                 />
                 <Footer
+                    countActiveTasks={this.calcActiveTasks()}
                     filters={Object.keys(this.filters)}
                     activeFilter={this.state.activeFilter}
                     changeFilter={this.changeFilter}
-                    countActiveTasks={this.calcActiveTasks()}
                     clearCompletedTasks={this.clearCompletedTasks}
                 />
             </section>

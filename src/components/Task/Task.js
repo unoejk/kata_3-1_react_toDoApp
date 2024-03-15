@@ -8,6 +8,47 @@ import './Task.css'
 
 
 export default class extends React.Component{
+    static defaultProps={
+        quest:'',
+        time:new Date(),
+        isCompleted:false,
+        completeTask:()=>{},
+        changeTask:()=>{},
+        removeTask:()=>{}
+    }
+    static propTypes={
+        quest:(props,propName,componentName)=>{
+            if (typeof props[propName]==='string')
+                return null
+            return new TypeError(`${componentName}: ${propName} must be string`)
+        },
+        time:(props,propName,componentName)=>{
+            if (props[propName] instanceof Date)
+                return null
+            return new TypeError(`${componentName}: ${propName} must be Date`)
+        },
+        isCompleted:(props,propName,componentName)=>{
+            if (typeof props[propName]==='boolean')
+                return null
+            return new TypeError(`${componentName}: ${propName} must be boolean`)
+        },
+        completeTask:(props,propName,componentName)=>{
+            if (typeof props[propName]==='function')
+                return null
+            return new TypeError(`${componentName}: ${propName} must be function`)
+        },
+        changeTask:(props,propName,componentName)=>{
+            if (typeof props[propName]==='function')
+                return null
+            return new TypeError(`${componentName}: ${propName} must be function`)
+        },
+        removeTask:(props,propName,componentName)=>{
+            if (typeof props[propName]==='function')
+                return null
+            return new TypeError(`${componentName}: ${propName} must be function`)
+        }
+    }
+
     state={
         isEditing:false,
         quest:''
@@ -15,12 +56,10 @@ export default class extends React.Component{
 
     taskStyleClass=()=>{
         let res=[]
-        if (this.props.isCompleted){
+        if (this.props.isCompleted)
             res.push('completed')
-        }
-        if (this.state.isEditing){
+        if (this.state.isEditing)
             res.push('editing')
-        }
         return res
             .join(' ')
     }

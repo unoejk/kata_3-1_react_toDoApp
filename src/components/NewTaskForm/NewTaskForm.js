@@ -6,6 +6,17 @@ import './NewTaskForm.css'
 
 
 export default class extends React.Component{
+    static defaultProps={
+        addTask:()=>{}
+    }
+    static propTypes={
+        addTask:(props,propName,componentName)=>{
+            if (typeof props[propName]==='function')
+                return null
+            return new TypeError(`${componentName}: ${propName} must be function`)
+        }
+    }
+
     state={
         quest:''
     }

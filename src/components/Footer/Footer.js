@@ -6,7 +6,7 @@ import './Footer.css'
 
 import TasksFilter from '../TasksFilter/TasksFilter'
 
-export default (props)=>{
+const Footer=(props)=>{
     const tasksFilterElemList=props.filters.map(val=>{
         return(
             <TasksFilter
@@ -31,3 +31,40 @@ export default (props)=>{
         </footer>
     )
 }
+
+Footer.defaultProps={
+    countActiveTasks:0,
+    filters:[],
+    activeFilter:'',
+    changeFilter:()=>{},
+    clearCompletedTasks:()=>{}
+}
+Footer.propTypes={
+    countActiveTasks:(props,propName,componentName)=>{
+        if (typeof props[propName]==='number')
+            return null
+        return new TypeError(`${componentName}: ${propName} must be number`)
+    },
+    filters:(props,propName,componentName)=>{
+        if (Array.isArray(props[propName]))
+            return null
+        return new TypeError(`${componentName}: ${propName} must be array`)
+    },
+    activeFilter:(props,propName,componentName)=>{
+        if (typeof props[propName]==='string')
+            return null
+        return new TypeError(`${componentName}: ${propName} must be string`)
+    },
+    changeFilter:(props,propName,componentName)=>{
+        if (typeof props[propName]==='function')
+            return null
+        return new TypeError(`${componentName}: ${propName} must be function`)
+    },
+    clearCompletedTasks:(props,propName,componentName)=>{
+        if (typeof props[propName]==='function')
+            return null
+        return new TypeError(`${componentName}: ${propName} must be function`)
+    }
+}
+
+export default Footer

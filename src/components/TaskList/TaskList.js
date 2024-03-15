@@ -5,18 +5,29 @@ import ReactDOM from "react-dom/client";
 import './TaskList.css'
 
 import Task from '../Task/Task'
+import Footer from "../Footer/Footer";
 
 
 // export default class extends React.Component{
-//     taskElemList=this.props.taskDataList.map((val)=>{
-//         const {id,...valWithoutId}=val
+//     // state={
+//     //     taskDataList:this.props.taskDataList
+//     // }
+//     // update=()=>{
+//     //     this.setState({
+//     //         taskDataList:this.props.taskDataList
+//     //     })
+//     // }
+//
+//     taskElemList=this.state.taskDataList.map((val)=>{
+//         const {id,...taskDataWithoutId}=val
 //         return(
 //             <Task
 //                 key={id}
-//                 {...valWithoutId}
-//                 completeTask={()=>this.props.completeTask(id)}
-//                 changeTask={()=>this.props.changeTask(id)}
+//                 {...taskDataWithoutId}
+//                 completeTask={(isCompleted)=>this.props.completeTask(id,isCompleted)}
+//                 changeTask={(newQuest)=>this.props.changeTask(id,newQuest)}
 //                 removeTask={()=>this.props.removeTask(id)}
+//                 // update={this.update}
 //             />
 //         )
 //     })
@@ -28,13 +39,13 @@ import Task from '../Task/Task'
 //     )}
 // }
 
-export default (props)=>{
+const TaskList=(props)=>{
     const taskElemList=props.taskDataList.map(val=>{
-        const {id,...valWithoutId}=val
+        const {id,...taskDataWithoutId}=val
         return(
             <Task
                 key={id}
-                {...valWithoutId}
+                {...taskDataWithoutId}
                 completeTask={(isCompleted)=>props.completeTask(id,isCompleted)}
                 changeTask={(newQuest)=>props.changeTask(id,newQuest)}
                 removeTask={()=>props.removeTask(id)}
@@ -48,3 +59,34 @@ export default (props)=>{
         </ul>
     )
 }
+
+TaskList.defaultProps={
+    taskDataList:[],
+    completeTask:()=>{},
+    changeTask:()=>{},
+    removeTask:()=>{}
+}
+TaskList.propTypes={
+    taskDataList:(props,propName,componentName)=>{
+        if (Array.isArray(props[propName]))
+            return null
+        return new TypeError(`${componentName}: ${propName} must be array`)
+    },
+    completeTask:(props,propName,componentName)=>{
+        if (typeof props[propName]==='function')
+            return null
+        return new TypeError(`${componentName}: ${propName} must be function`)
+    },
+    changeTask:(props,propName,componentName)=>{
+        if (typeof props[propName]==='function')
+            return null
+        return new TypeError(`${componentName}: ${propName} must be function`)
+    },
+    removeTask:(props,propName,componentName)=>{
+        if (typeof props[propName]==='function')
+            return null
+        return new TypeError(`${componentName}: ${propName} must be function`)
+    }
+}
+
+export default TaskList
