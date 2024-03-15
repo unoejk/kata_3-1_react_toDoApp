@@ -29,7 +29,7 @@ import Task from '../Task/Task'
 // }
 
 export default (props)=>{
-    const taskElemList=props.taskDataList.map((val)=>{
+    const taskElemList=props.taskDataList.map(val=>{
         const {id,...valWithoutId}=val
         return(
             <Task

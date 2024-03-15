@@ -1,13 +1,9 @@
 
-// ---- import
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 
 import './NewTaskForm.css'
 
-
-// ---- go-go
 
 export default class extends React.Component{
     state={

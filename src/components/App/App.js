@@ -23,8 +23,7 @@ export default class extends React.Component{
             time:msPassed
                 ?this.genExTime(msPassed)
                 :new Date(),
-            isCompleted:false,
-            isEditing:false
+            isCompleted:false
         }
     }
 
@@ -33,7 +32,20 @@ export default class extends React.Component{
             this.createTask('Completed task',1000*17),
             this.createTask('Editing task',1000*60*5),
             this.createTask('Active task',1000*60*5)
-        ]
+        ],
+        activeFilter:'All'
+    }
+
+    filters={
+        All:()=>{
+            return this.state.taskDataList
+        },
+        Active:()=>{
+            return this.state.taskDataList.filter(val=>!val.isCompleted)
+        },
+        Completed:()=>{
+            return this.state.taskDataList.filter(val=>val.isCompleted)
+        }
     }
 
 
@@ -46,9 +58,6 @@ export default class extends React.Component{
             taskDataList:newTaskDataList
         })
     }
-
-
-    // ---------------- forTaskList
 
     // completeTask=(id)=>{
     //     // console.log('hi')
@@ -105,10 +114,23 @@ export default class extends React.Component{
 
     // ---------------- forFooter
 
+    changeFilter=(newFilter)=>{
+        this.setState({
+            activeFilter:newFilter
+        })
+    }
+
     calcActiveTasks=()=>{
         return this.state.taskDataList
             .filter(val=>!val.isCompleted)
             .length
+    }
+
+    clearCompletedTasks=()=>{
+        this.setState({
+            taskDataList:this.state.taskDataList.filter(val=>!val.isCompleted),
+            activeFilter:this.state.activeFilter
+        })
     }
 
 
@@ -121,13 +143,17 @@ export default class extends React.Component{
             />
             <section className="main">
                 <TaskList
-                    taskDataList={this.state.taskDataList}
+                    taskDataList={this.filters[this.state.activeFilter]()}
                     completeTask={this.completeTask}
                     changeTask={this.changeTask}
                     removeTask={this.removeTask}
                 />
                 <Footer
+                    filters={Object.keys(this.filters)}
+                    activeFilter={this.state.activeFilter}
+                    changeFilter={this.changeFilter}
                     countActiveTasks={this.calcActiveTasks()}
+                    clearCompletedTasks={this.clearCompletedTasks}
                 />
             </section>
         </section>
