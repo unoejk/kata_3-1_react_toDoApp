@@ -1,5 +1,5 @@
 {
-  "name": "ex",
+  "name": "kata_3-1_react_to-do-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -60,8 +60,8 @@
   },
   "lint-staged": {
     "*.js": [
-      "yarn lint:fix",
-      "yarn format",
+      "npm run lint:fix",
+      "npm run format",
       "git add"
     ]
   }
