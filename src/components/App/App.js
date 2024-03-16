@@ -1,6 +1,5 @@
-
-import React from "react";
-import ReactDOM from "react-dom/client";
+import React from 'react'
+// import ReactDOM from 'react-dom/client'
 
 import './App.css'
 
@@ -8,154 +7,147 @@ import TaskList from '../TaskList/TaskList'
 import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import Footer from '../Footer/Footer'
 
+export default class App extends React.Component {
+  lastId = 0
 
-export default class extends React.Component{
-    lastId=0
+  genExTime = (ms) => {
+    // делает дату на заданное количество ms позже
+    return new Date(new Date().getTime() - ms)
+  }
 
-    genExTime=(ms)=>{   // делает дату на заданное количество ms позже
-        return new Date((new Date()).getTime()-ms)
+  createTask = (quest, msPassed) => {
+    return {
+      id: this.lastId++,
+      quest: quest,
+      time: msPassed ? this.genExTime(msPassed) : new Date(),
+      isCompleted: false,
     }
+  }
 
-    createTask=(quest,msPassed)=>{
-        return {
-            id:this.lastId++,
-            quest:quest,
-            time:msPassed
-                ?this.genExTime(msPassed)
-                :new Date(),
-            isCompleted:false
-        }
-    }
+  state = {
+    taskDataList: [
+      this.createTask('Completed task', 1000 * 17),
+      this.createTask('Editing task', 1000 * 60 * 5),
+      this.createTask('Active task', 1000 * 60 * 5),
+    ],
+    activeFilter: 'All',
+  }
 
-    state={
-        taskDataList:[
-            this.createTask('Completed task',1000*17),
-            this.createTask('Editing task',1000*60*5),
-            this.createTask('Active task',1000*60*5)
-        ],
-        activeFilter:'All'
-    }
+  filters = {
+    All: () => {
+      return this.state.taskDataList
+    },
+    Active: () => {
+      return this.state.taskDataList.filter((val) => !val.isCompleted)
+    },
+    Completed: () => {
+      return this.state.taskDataList.filter((val) => val.isCompleted)
+    },
+  }
 
-    filters={
-        All:()=>{
-            return this.state.taskDataList
-        },
-        Active:()=>{
-            return this.state.taskDataList.filter(val=>!val.isCompleted)
-        },
-        Completed:()=>{
-            return this.state.taskDataList.filter(val=>val.isCompleted)
-        }
-    }
+  // ---------------- forNewTaskForm
 
+  addTask = (quest) => {
+    const newTask = this.createTask(quest)
+    const newTaskDataList = [...this.state.taskDataList, newTask]
+    this.setState({
+      taskDataList: newTaskDataList,
+    })
+  }
 
-    // ---------------- forNewTaskForm
+  // completeTask=(id)=>{
+  //     // console.log('hi')
+  //     this.setState((state)=>{
+  //         const newTaskDataList=state.taskDataList.slice()
+  //         const taskPosition=newTaskDataList.findIndex(val=>val.id===id)
+  //         const newMark=!newTaskDataList[taskPosition].isCompleted
+  //         newTaskDataList[taskPosition].isCompleted=newMark
+  //         // console.log(newTaskDataList[taskPosition].isCompleted)
+  //         // console.log(newTaskDataList[taskPosition])
+  //         // console.log(newTaskDataList)
+  //         return{
+  //             taskDataList:newTaskDataList
+  //         }
+  //     })
+  // }
+  // completeTask=(id)=>{
+  //     const newTaskDataList=this.state.taskDataList.slice()
+  //     const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
+  //     const newMark=!newTaskDataList[taskPosition].isCompleted
+  //     newTaskDataList[taskPosition].isCompleted=newMark
+  //     this.setState({
+  //         taskDataList:newTaskDataList
+  //     })
+  // }
+  completeTask = (id, isCompleted) => {
+    const newTaskDataList = this.state.taskDataList.slice()
+    const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
+    newTaskDataList[taskPosition].isCompleted = !isCompleted
+    this.setState({
+      taskDataList: newTaskDataList,
+    })
+  }
 
-    addTask=(quest)=>{
-        const newTask=this.createTask(quest)
-        const newTaskDataList=[...this.state.taskDataList,newTask]
-        this.setState({
-            taskDataList:newTaskDataList
-        })
-    }
+  changeTask = (id, newQuest) => {
+    const newTaskDataList = this.state.taskDataList.slice()
+    const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
+    newTaskDataList[taskPosition].quest = newQuest
+    this.setState({
+      taskDataList: newTaskDataList,
+    })
+  }
 
-    // completeTask=(id)=>{
-    //     // console.log('hi')
-    //     this.setState((state)=>{
-    //         const newTaskDataList=state.taskDataList.slice()
-    //         const taskPosition=newTaskDataList.findIndex(val=>val.id===id)
-    //         const newMark=!newTaskDataList[taskPosition].isCompleted
-    //         newTaskDataList[taskPosition].isCompleted=newMark
-    //         // console.log(newTaskDataList[taskPosition].isCompleted)
-    //         // console.log(newTaskDataList[taskPosition])
-    //         // console.log(newTaskDataList)
-    //         return{
-    //             taskDataList:newTaskDataList
-    //         }
-    //     })
-    // }
-    // completeTask=(id)=>{
-    //     const newTaskDataList=this.state.taskDataList.slice()
-    //     const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
-    //     const newMark=!newTaskDataList[taskPosition].isCompleted
-    //     newTaskDataList[taskPosition].isCompleted=newMark
-    //     this.setState({
-    //         taskDataList:newTaskDataList
-    //     })
-    // }
-    completeTask=(id,isCompleted)=>{
-        const newTaskDataList=this.state.taskDataList.slice()
-        const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
-        newTaskDataList[taskPosition].isCompleted=!isCompleted
-        this.setState({
-            taskDataList:newTaskDataList
-        })
-    }
+  removeTask = (id) => {
+    const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
+    const before = this.state.taskDataList.slice(0, taskPosition)
+    const after = this.state.taskDataList.slice(taskPosition + 1)
+    const newTaskDataList = [...before, ...after]
+    this.setState({
+      taskDataList: newTaskDataList,
+    })
+  }
 
-    changeTask=(id,newQuest)=>{
-        const newTaskDataList=this.state.taskDataList.slice()
-        const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
-        newTaskDataList[taskPosition].quest=newQuest
-        this.setState({
-            taskDataList:newTaskDataList
-        })
-    }
+  // ---------------- forFooter
 
-    removeTask=(id)=>{
-        const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
-        const before=this.state.taskDataList.slice(0,taskPosition)
-        const after=this.state.taskDataList.slice(taskPosition+1)
-        const newTaskDataList=[...before,...after]
-        this.setState({
-            taskDataList:newTaskDataList
-        })
-    }
+  calcActiveTasks = () => {
+    return this.state.taskDataList.filter((val) => !val.isCompleted).length
+  }
 
+  changeFilter = (newFilter) => {
+    this.setState({
+      activeFilter: newFilter,
+    })
+  }
 
-    // ---------------- forFooter
+  clearCompletedTasks = () => {
+    this.setState({
+      taskDataList: this.state.taskDataList.filter((val) => !val.isCompleted),
+      activeFilter: this.state.activeFilter,
+    })
+  }
 
-    calcActiveTasks=()=>{
-        return this.state.taskDataList
-            .filter(val=>!val.isCompleted)
-            .length
-    }
+  // ---------------- go-go
 
-    changeFilter=(newFilter)=>{
-        this.setState({
-            activeFilter:newFilter
-        })
-    }
-
-    clearCompletedTasks=()=>{
-        this.setState({
-            taskDataList:this.state.taskDataList.filter(val=>!val.isCompleted),
-            activeFilter:this.state.activeFilter
-        })
-    }
-
-
-    // ---------------- go-go
-
-    render() {return(
-        <section className="todoapp">
-            <NewTaskForm
-                addTask={this.addTask}
-            />
-            <section className="main">
-                <TaskList
-                    taskDataList={this.filters[this.state.activeFilter]()}
-                    completeTask={this.completeTask}
-                    changeTask={this.changeTask}
-                    removeTask={this.removeTask}
-                />
-                <Footer
-                    countActiveTasks={this.calcActiveTasks()}
-                    filters={Object.keys(this.filters)}
-                    activeFilter={this.state.activeFilter}
-                    changeFilter={this.changeFilter}
-                    clearCompletedTasks={this.clearCompletedTasks}
-                />
-            </section>
+  render() {
+    return (
+      <section className="todoapp">
+        <NewTaskForm addTask={this.addTask} />
+        <section className="main">
+          <TaskList
+            taskDataList={this.filters[this.state.activeFilter]()}
+            completeTask={this.completeTask}
+            changeTask={this.changeTask}
+            removeTask={this.removeTask}
+          />
+          <Footer
+            countActiveTasks={this.calcActiveTasks()}
+            filters={Object.keys(this.filters)}
+            activeFilter={this.state.activeFilter}
+            changeFilter={this.changeFilter}
+            clearCompletedTasks={this.clearCompletedTasks}
+          />
         </section>
-    )}
+      </section>
+    )
+  }
 }
