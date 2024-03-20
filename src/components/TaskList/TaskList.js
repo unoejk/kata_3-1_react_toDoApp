@@ -39,15 +39,21 @@ import Task from '../Task/Task'
 const TaskList = (props) => {
   const taskElemList = props.taskDataList.map((val) => {
     const { id, ...taskDataWithoutId } = val
-    return (
-      <Task
-        key={id}
-        {...taskDataWithoutId}
-        completeTask={(isCompleted) => props.completeTask(id, isCompleted)}
-        changeTask={(newQuest) => props.changeTask(id, newQuest)}
-        removeTask={() => props.removeTask(id)}
-      />
-    )
+    if (
+      props.activeFilter === 'All' ||
+      (props.activeFilter === 'Active' && !taskDataWithoutId.isCompleted) ||
+      (props.activeFilter === 'Completed' && taskDataWithoutId.isCompleted)
+    ) {
+      return (
+        <Task
+          key={id}
+          {...taskDataWithoutId}
+          completeTask={(isCompleted) => props.completeTask(id, isCompleted)}
+          changeTask={(newQuest) => props.changeTask(id, newQuest)}
+          removeTask={() => props.removeTask(id)}
+        />
+      )
+    }
   })
 
   return <ul className="todo-list">{taskElemList}</ul>

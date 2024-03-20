@@ -6,7 +6,7 @@ import './Footer.css'
 import TasksFilter from '../TasksFilter/TasksFilter'
 
 const Footer = (props) => {
-  const tasksFilterElemList = props.filters.map((val) => {
+  const tasksFilterElemList = ['All', 'Active', 'Completed'].map((val) => {
     return (
       <TasksFilter
         key={val}
@@ -30,7 +30,6 @@ const Footer = (props) => {
 
 Footer.defaultProps = {
   countActiveTasks: 0,
-  filters: [],
   activeFilter: '',
   changeFilter: () => {},
   clearCompletedTasks: () => {},
@@ -39,10 +38,6 @@ Footer.propTypes = {
   countActiveTasks: (props, propName, componentName) => {
     if (typeof props[propName] === 'number') return null
     return new TypeError(`${componentName}: ${propName} must be number`)
-  },
-  filters: (props, propName, componentName) => {
-    if (Array.isArray(props[propName])) return null
-    return new TypeError(`${componentName}: ${propName} must be array`)
   },
   activeFilter: (props, propName, componentName) => {
     if (typeof props[propName] === 'string') return null

@@ -72,13 +72,15 @@ export default class Task extends React.Component {
 
   // changeTask
   questOnChange = (e) => {
+    if (e.target.value.trim() !== '') {
+      this.props.changeTask(e.target.value)
+    }
     this.setState({
       quest: e.target.value,
     })
   }
   questOnKeyUp = (e) => {
     if (e.key === 'Enter') {
-      this.props.changeTask(this.state.quest)
       this.switchChange()
       this.setState({
         quest: '',

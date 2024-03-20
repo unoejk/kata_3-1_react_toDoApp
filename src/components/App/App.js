@@ -33,18 +33,6 @@ export default class App extends React.Component {
     activeFilter: 'All',
   }
 
-  filters = {
-    All: () => {
-      return this.state.taskDataList
-    },
-    Active: () => {
-      return this.state.taskDataList.filter((val) => !val.isCompleted)
-    },
-    Completed: () => {
-      return this.state.taskDataList.filter((val) => val.isCompleted)
-    },
-  }
-
   // ---------------- forNewTaskForm
 
   addTask = (quest) => {
@@ -54,6 +42,8 @@ export default class App extends React.Component {
       taskDataList: newTaskDataList,
     })
   }
+
+  // ---------------- forTaskList
 
   // completeTask=(id)=>{
   //     // console.log('hi')
@@ -134,14 +124,14 @@ export default class App extends React.Component {
         <NewTaskForm addTask={this.addTask} />
         <section className="main">
           <TaskList
-            taskDataList={this.filters[this.state.activeFilter]()}
+            taskDataList={this.state.taskDataList}
+            activeFilter={this.state.activeFilter}
             completeTask={this.completeTask}
             changeTask={this.changeTask}
             removeTask={this.removeTask}
           />
           <Footer
             countActiveTasks={this.calcActiveTasks()}
-            filters={Object.keys(this.filters)}
             activeFilter={this.state.activeFilter}
             changeFilter={this.changeFilter}
             clearCompletedTasks={this.clearCompletedTasks}

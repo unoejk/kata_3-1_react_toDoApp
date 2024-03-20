@@ -16,6 +16,7 @@ export default class NewTaskForm extends React.Component {
 
   state = {
     quest: '',
+    placeholder: 'What needs to be done?',
   }
 
   // addTask
@@ -26,10 +27,18 @@ export default class NewTaskForm extends React.Component {
   }
   onKeyUp = (e) => {
     if (e.key === 'Enter') {
-      this.props.addTask(this.state.quest)
-      this.setState({
-        quest: '',
-      })
+      if (this.state.quest.trim() === '') {
+        this.setState({
+          quest: '',
+          placeholder: 'Require to write task',
+        })
+      } else {
+        this.props.addTask(this.state.quest)
+        this.setState({
+          quest: '',
+          placeholder: 'What needs to be done?',
+        })
+      }
     }
   }
 
@@ -39,7 +48,7 @@ export default class NewTaskForm extends React.Component {
         <h1>Enter = Submit</h1>
         <input
           className="new-todo"
-          placeholder="What needs to be done?"
+          placeholder={this.state.placeholder}
           autoFocus
           value={this.state.quest}
           onChange={this.onChange}
