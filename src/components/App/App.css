@@ -82,6 +82,15 @@ body {
   border-top: 1px solid #e6e6e6;
 }
 
+/*inputNumberFix*/
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
 /*.info {*/
 /*    margin: 65px auto 0;*/
 /*    color: #4d4d4d;*/
