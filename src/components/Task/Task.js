@@ -54,7 +54,21 @@ export default class Task extends React.Component {
   }
 
   componentDidMount() {
-    setInterval(this.updateSecTimerBalance, 1000)
+    this.interval = setInterval(this.updateComp, 1000)
+  }
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
+  updateComp = () => {
+    if (this.state.isCounting) {
+      this.updateSecTimerBalance()
+    } else {
+      // чтобы created ... ago обновлялось посекундно, когда таймер выключен
+      this.setState({
+        updateFlag: this.state.updateFlag + 1,
+      })
+    }
   }
 
   taskStyleClass = () => {
@@ -116,15 +130,12 @@ export default class Task extends React.Component {
     return res
   }
   updateSecTimerBalance = () => {
-    this.setState({
-      updateFlag: this.state.updateFlag + 1,
-    })
-    if (this.state.isCounting) {
-      if (this.state.secTimerBalance === 0) {
-        this.setState({
-          isCounting: false,
-        })
-      }
+    if (this.state.secTimerBalance === 1) {
+      this.setState({
+        isCounting: false,
+        secTimerBalance: this.state.secTimerBalance - 1,
+      })
+    } else {
       this.setState({
         secTimerBalance: this.state.secTimerBalance - 1,
       })

@@ -27,7 +27,7 @@ export default class App extends React.Component {
 
   state = {
     taskDataList: [
-      this.createTask('fw', 12 * 60 + 25, 1000 * 17),
+      this.createTask('fw', 2, 1000 * 17),
       this.createTask('fw', 0, 1000 * 60 * 5),
       this.createTask('fw', 12 * 60 + 25, 1000 * 60 * 5),
       // this.createTask('Completed task', 1000 * 17),
