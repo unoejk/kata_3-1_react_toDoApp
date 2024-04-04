@@ -10,6 +10,7 @@ export default class Task extends React.Component {
     creationData: new Date(),
     secTimer: 0,
     isCompleted: false,
+    countTask: () => {},
     completeTask: () => {},
     changeTask: () => {},
     removeTask: () => {},
@@ -31,6 +32,10 @@ export default class Task extends React.Component {
       if (typeof props[propName] === 'boolean') return null
       return new TypeError(`${componentName}: ${propName} must be boolean`)
     },
+    countTask: (props, propName, componentName) => {
+      if (typeof props[propName] === 'function') return null
+      return new TypeError(`${componentName}: ${propName} must be function`)
+    },
     completeTask: (props, propName, componentName) => {
       if (typeof props[propName] === 'function') return null
       return new TypeError(`${componentName}: ${propName} must be function`)
@@ -46,29 +51,8 @@ export default class Task extends React.Component {
   }
 
   state = {
-    quest: this.props.quest,
-    secTimerBalance: this.props.secTimer,
     isEditing: false,
-    isCounting: false,
-    updateFlag: 0,
-  }
-
-  componentDidMount() {
-    this.interval = setInterval(this.updateComp, 1000)
-  }
-  componentWillUnmount() {
-    clearInterval(this.interval)
-  }
-
-  updateComp = () => {
-    if (this.state.isCounting) {
-      this.updateSecTimerBalance()
-    } else {
-      // чтобы created ... ago обновлялось посекундно, когда таймер выключен
-      this.setState({
-        updateFlag: this.state.updateFlag + 1,
-      })
-    }
+    editingQuest: this.props.quest,
   }
 
   taskStyleClass = () => {
@@ -86,29 +70,39 @@ export default class Task extends React.Component {
     })
   }
 
-  completeTask = () => {
-    this.props.completeTask(this.props.isCompleted)
-  }
+  // countTask=(isCounting)=>{
+  //     this.props.countTask(isCounting)
+  // }
 
-  removeTask = () => {
-    this.props.removeTask()
-  }
+  // completeTask = () => {
+  //   this.props.completeTask(!this.props.isCompleted)
+  // }
+
+  // removeTask = () => {
+  //   this.props.removeTask()
+  // }
 
   // changeTask
   questOnChange = (e) => {
-    if (e.target.value.trim() !== '') {
-      this.props.changeTask(e.target.value)
-    }
     this.setState({
-      quest: e.target.value,
+      editingQuest: e.target.value,
     })
   }
   questOnKeyUp = (e) => {
     if (e.key === 'Enter') {
-      this.switchChange()
-      this.setState({
-        quest: '',
-      })
+      const editedQuest = this.state.editingQuest.trim()
+      if (this.state.editingQuest.trim() !== '') {
+        console.log(this.state.editingQuest.trim())
+        this.props.changeTask(editedQuest)
+        this.switchChange()
+        this.setState({
+          editingQuest: editedQuest,
+        })
+      } else {
+        this.setState({
+          editingQuest: this.props.quest,
+        })
+      }
     }
   }
 
@@ -118,7 +112,7 @@ export default class Task extends React.Component {
   }
   getSecTimerString = () => {
     let res = ''
-    let rem = this.state.secTimerBalance
+    let rem = this.props.secTimer
     res += Math.floor(rem / (10 * 60))
     rem = rem % (10 * 60)
     res += Math.floor(rem / 60)
@@ -129,60 +123,48 @@ export default class Task extends React.Component {
     res += rem
     return res
   }
-  updateSecTimerBalance = () => {
-    if (this.state.secTimerBalance === 1) {
-      this.setState({
-        isCounting: false,
-        secTimerBalance: this.state.secTimerBalance - 1,
-      })
-    } else {
-      this.setState({
-        secTimerBalance: this.state.secTimerBalance - 1,
-      })
-    }
-  }
-  switchTimer = (bool) => {
-    this.setState(() => {
-      return {
-        isCounting: bool,
-      }
-    })
-  }
 
   render() {
     return (
       <li className={this.taskStyleClass()}>
         <div className="view">
-          <input className="toggle" type="checkbox" checked={this.props.isCompleted} onChange={this.completeTask} />
+          <input
+            className="toggle"
+            type="checkbox"
+            checked={this.props.isCompleted}
+            onChange={() => {
+              this.props.completeTask(!this.props.isCompleted)
+            }}
+          />
           <label>
             <span className="title">{this.props.quest}</span>
             <span className="description">
               <button
                 className="icon icon-play"
                 onClick={() => {
-                  this.switchTimer(true)
+                  this.props.countTask(true)
                 }}
-                disabled={this.state.secTimerBalance === 0}
+                disabled={this.props.secTimer === 0}
               ></button>
               <button
                 className="icon icon-pause"
                 onClick={() => {
-                  this.switchTimer(false)
+                  this.props.countTask(false)
                 }}
-                disabled={this.state.secTimerBalance === 0}
+                disabled={this.props.secTimer === 0}
               ></button>
               {this.getSecTimerString()}
             </span>
             <span className="description">{this.getCreationDataString()}</span>
           </label>
           <button className="icon icon-edit" onClick={this.switchChange}></button>
-          <button className="icon icon-destroy" onClick={this.removeTask}></button>
+          <button className="icon icon-destroy" onClick={this.props.removeTask}></button>
         </div>
         <input
           type="text"
           className="edit"
           placeholder="Editing task"
-          value={this.state.quest}
+          value={this.state.editingQuest}
           onChange={this.questOnChange}
           onKeyUp={this.questOnKeyUp}
         />

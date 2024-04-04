@@ -28,13 +28,10 @@ export default class NewTaskForm extends React.Component {
   }
   onKeyUp = (e) => {
     if (e.key === 'Enter') {
-      if (this.state.quest.trim() !== '') {
-        let secTimer = 0
-        let min = Math.floor(this.state.min)
-        let sec = Math.floor(this.state.sec)
-        if (min >= 0 && sec >= 0 && sec <= 60 && min * 60 + sec <= 60 * 60) {
-          secTimer = min * 60 + sec
-        }
+      let min = Math.floor(this.state.min)
+      let sec = Math.floor(this.state.sec)
+      if (this.state.quest.trim() !== '' && min >= 0 && sec >= 0 && min + sec > 0 && sec < 60 && min < 60) {
+        const secTimer = min * 60 + sec
         this.props.addTask(this.state.quest, secTimer)
       }
       this.setState({

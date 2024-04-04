@@ -20,8 +20,9 @@ export default class App extends React.Component {
       id: this.lastId++,
       quest: quest,
       creationData: msPassed ? this.genExTime(msPassed) : new Date(),
-      secTimer: secTimer,
+      secTimer: secTimer ? secTimer : 0,
       isCompleted: false,
+      isCounting: false,
     }
   }
 
@@ -35,6 +36,32 @@ export default class App extends React.Component {
       // this.createTask('Active task', 1000 * 60 * 5),
     ],
     activeFilter: 'All',
+    // updateFlag: 0,
+  }
+
+  // ---------------- timer
+
+  componentDidMount() {
+    this.interval = setInterval(this.updateTimer, 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
+  updateTimer = () => {
+    const newTaskDataList = this.state.taskDataList.slice()
+    newTaskDataList.map((val) => {
+      if (val.isCounting) {
+        val.secTimer--
+        if (val.secTimer === 0) val.isCounting = false
+      }
+      return val
+    })
+    this.setState({
+      taskDataList: newTaskDataList,
+      // updateFlag: this.state.updateFlag + 1,
+    })
   }
 
   // ---------------- forNewTaskForm
@@ -49,34 +76,19 @@ export default class App extends React.Component {
 
   // ---------------- forTaskList
 
-  // completeTask=(id)=>{
-  //     // console.log('hi')
-  //     this.setState((state)=>{
-  //         const newTaskDataList=state.taskDataList.slice()
-  //         const taskPosition=newTaskDataList.findIndex(val=>val.id===id)
-  //         const newMark=!newTaskDataList[taskPosition].isCompleted
-  //         newTaskDataList[taskPosition].isCompleted=newMark
-  //         // console.log(newTaskDataList[taskPosition].isCompleted)
-  //         // console.log(newTaskDataList[taskPosition])
-  //         // console.log(newTaskDataList)
-  //         return{
-  //             taskDataList:newTaskDataList
-  //         }
-  //     })
-  // }
-  // completeTask=(id)=>{
-  //     const newTaskDataList=this.state.taskDataList.slice()
-  //     const taskPosition=this.state.taskDataList.findIndex(val=>val.id===id)
-  //     const newMark=!newTaskDataList[taskPosition].isCompleted
-  //     newTaskDataList[taskPosition].isCompleted=newMark
-  //     this.setState({
-  //         taskDataList:newTaskDataList
-  //     })
-  // }
+  countTask = (id, isCounting) => {
+    const newTaskDataList = this.state.taskDataList.slice()
+    const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
+    newTaskDataList[taskPosition].isCounting = isCounting
+    this.setState({
+      taskDataList: newTaskDataList,
+    })
+  }
+
   completeTask = (id, isCompleted) => {
     const newTaskDataList = this.state.taskDataList.slice()
     const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
-    newTaskDataList[taskPosition].isCompleted = !isCompleted
+    newTaskDataList[taskPosition].isCompleted = isCompleted
     this.setState({
       taskDataList: newTaskDataList,
     })
@@ -130,6 +142,7 @@ export default class App extends React.Component {
           <TaskList
             taskDataList={this.state.taskDataList}
             activeFilter={this.state.activeFilter}
+            countTask={this.countTask}
             completeTask={this.completeTask}
             changeTask={this.changeTask}
             removeTask={this.removeTask}
