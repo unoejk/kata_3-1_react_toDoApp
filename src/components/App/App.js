@@ -1,56 +1,40 @@
-import React from 'react'
-// import ReactDOM from 'react-dom/client'
+import React, { useState, useEffect } from 'react'
 
 import './App.css'
-
 import TaskList from '../TaskList/TaskList'
 import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import Footer from '../Footer/Footer'
 
-export default class App extends React.Component {
-  lastId = 0
+const App = () => {
+  let lastId = 0
 
-  genExTime = (ms) => {
+  const genExTime = (ms) => {
     // делает дату на заданное количество ms позже
     return new Date(new Date().getTime() - ms)
   }
 
-  createTask = (quest, secTimer, msPassed) => {
+  const createTask = (quest, secTimer, msPassed) => {
     return {
-      id: this.lastId++,
+      id: lastId++,
       quest: quest,
-      creationData: msPassed ? this.genExTime(msPassed) : new Date(),
+      creationData: msPassed ? genExTime(msPassed) : new Date(),
       secTimer: secTimer ? secTimer : 0,
       isCompleted: false,
       isCounting: false,
     }
   }
 
-  state = {
-    taskDataList: [
-      this.createTask('fw', 2, 1000 * 17),
-      this.createTask('fw', 0, 1000 * 60 * 5),
-      this.createTask('fw', 12 * 60 + 25, 1000 * 60 * 5),
-      // this.createTask('Completed task', 1000 * 17),
-      // this.createTask('Editing task', 1000 * 60 * 5),
-      // this.createTask('Active task', 1000 * 60 * 5),
-    ],
-    activeFilter: 'All',
-    // updateFlag: 0,
-  }
+  const [taskDataList, setTaskDataList] = useState([
+    createTask('fw', 2, 1000 * 17),
+    createTask('fw', 0, 1000 * 60 * 5),
+    createTask('fw', 12 * 60 + 25, 1000 * 60 * 5),
+  ])
+  const [activeFilter, setActiveFilter] = useState('All')
 
   // ---------------- timer
 
-  componentDidMount() {
-    this.interval = setInterval(this.updateTimer, 1000)
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval)
-  }
-
-  updateTimer = () => {
-    const newTaskDataList = this.state.taskDataList.slice()
+  const updateTimer = () => {
+    const newTaskDataList = taskDataList.slice()
     newTaskDataList.map((val) => {
       if (val.isCounting) {
         val.secTimer--
@@ -58,103 +42,91 @@ export default class App extends React.Component {
       }
       return val
     })
-    this.setState({
-      taskDataList: newTaskDataList,
-      // updateFlag: this.state.updateFlag + 1,
-    })
+    setTaskDataList(newTaskDataList)
   }
+
+  useEffect(() => {
+    const interval = setInterval(updateTimer, 1000)
+    return () => clearInterval(interval)
+  })
 
   // ---------------- forNewTaskForm
 
-  addTask = (quest, secTimer) => {
-    const newTask = this.createTask(quest, secTimer)
-    const newTaskDataList = [...this.state.taskDataList, newTask]
-    this.setState({
-      taskDataList: newTaskDataList,
-    })
+  const addTask = (quest, secTimer) => {
+    const newTask = createTask(quest, secTimer)
+    const newTaskDataList = [...taskDataList, newTask]
+    setTaskDataList(newTaskDataList)
   }
 
   // ---------------- forTaskList
 
-  countTask = (id, isCounting) => {
-    const newTaskDataList = this.state.taskDataList.slice()
-    const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
+  const countTask = (id, isCounting) => {
+    const newTaskDataList = taskDataList.slice()
+    const taskPosition = taskDataList.findIndex((val) => val.id === id)
     newTaskDataList[taskPosition].isCounting = isCounting
-    this.setState({
-      taskDataList: newTaskDataList,
-    })
+    setTaskDataList(newTaskDataList)
   }
 
-  completeTask = (id, isCompleted) => {
-    const newTaskDataList = this.state.taskDataList.slice()
-    const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
+  const completeTask = (id, isCompleted) => {
+    const newTaskDataList = taskDataList.slice()
+    const taskPosition = taskDataList.findIndex((val) => val.id === id)
     newTaskDataList[taskPosition].isCompleted = isCompleted
-    this.setState({
-      taskDataList: newTaskDataList,
-    })
+    setTaskDataList(newTaskDataList)
   }
 
-  changeTask = (id, newQuest) => {
-    const newTaskDataList = this.state.taskDataList.slice()
-    const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
+  const changeTask = (id, newQuest) => {
+    const newTaskDataList = taskDataList.slice()
+    const taskPosition = taskDataList.findIndex((val) => val.id === id)
     newTaskDataList[taskPosition].quest = newQuest
-    this.setState({
-      taskDataList: newTaskDataList,
-    })
+    setTaskDataList(newTaskDataList)
   }
 
-  removeTask = (id) => {
-    const taskPosition = this.state.taskDataList.findIndex((val) => val.id === id)
-    const before = this.state.taskDataList.slice(0, taskPosition)
-    const after = this.state.taskDataList.slice(taskPosition + 1)
+  const removeTask = (id) => {
+    const taskPosition = taskDataList.findIndex((val) => val.id === id)
+    const before = taskDataList.slice(0, taskPosition)
+    const after = taskDataList.slice(taskPosition + 1)
     const newTaskDataList = [...before, ...after]
-    this.setState({
-      taskDataList: newTaskDataList,
-    })
+    setTaskDataList(newTaskDataList)
   }
 
   // ---------------- forFooter
 
-  calcActiveTasks = () => {
-    return this.state.taskDataList.filter((val) => !val.isCompleted).length
+  const calcActiveTasks = () => {
+    return taskDataList.filter((val) => !val.isCompleted).length
   }
 
-  changeFilter = (newFilter) => {
-    this.setState({
-      activeFilter: newFilter,
-    })
+  const changeFilter = (newFilter) => {
+    setActiveFilter(newFilter)
   }
 
-  clearCompletedTasks = () => {
-    this.setState({
-      taskDataList: this.state.taskDataList.filter((val) => !val.isCompleted),
-      activeFilter: this.state.activeFilter,
-    })
+  const clearCompletedTasks = () => {
+    setTaskDataList(taskDataList.filter((val) => !val.isCompleted))
+    setActiveFilter(activeFilter)
   }
 
   // ---------------- go-go
 
-  render() {
-    return (
-      <section className="todoapp">
-        <NewTaskForm addTask={this.addTask} />
-        <section className="main">
-          <TaskList
-            taskDataList={this.state.taskDataList}
-            activeFilter={this.state.activeFilter}
-            countTask={this.countTask}
-            completeTask={this.completeTask}
-            changeTask={this.changeTask}
-            removeTask={this.removeTask}
-          />
-          <Footer
-            countActiveTasks={this.calcActiveTasks()}
-            activeFilter={this.state.activeFilter}
-            changeFilter={this.changeFilter}
-            clearCompletedTasks={this.clearCompletedTasks}
-          />
-        </section>
+  return (
+    <section className="todoapp">
+      <NewTaskForm addTask={addTask} />
+      <section className="main">
+        <TaskList
+          taskDataList={taskDataList}
+          activeFilter={activeFilter}
+          countTask={countTask}
+          completeTask={completeTask}
+          changeTask={changeTask}
+          removeTask={removeTask}
+        />
+        <Footer
+          countActiveTasks={calcActiveTasks()}
+          activeFilter={activeFilter}
+          changeFilter={changeFilter}
+          clearCompletedTasks={clearCompletedTasks}
+        />
       </section>
-    )
-  }
+    </section>
+  )
 }
+
+export default App

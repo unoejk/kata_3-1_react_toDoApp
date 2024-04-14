@@ -1,92 +1,93 @@
-import React from 'react'
-// import ReactDOM from 'react-dom/client'
-
+import React, { useState } from 'react'
 import './NewTaskForm.css'
 
-export default class NewTaskForm extends React.Component {
-  static defaultProps = {
-    addTask: () => {},
-  }
-  static propTypes = {
-    addTask: (props, propName, componentName) => {
-      if (typeof props[propName] === 'function') return null
-      return new TypeError(`${componentName}: ${propName} must be function`)
-    },
-  }
+const NewTaskForm = (props) => {
+  const [placeholder, setPlaceholder] = useState('Task')
+  const [quest, setQuest] = useState('')
+  const [min, setMin] = useState('')
+  const [sec, setSec] = useState('')
 
-  state = {
-    quest: '',
-    min: '',
-    sec: '',
+  const onChange = (e, setter) => {
+    setter(e.target.value)
   }
-
-  // addTask
-  onChange = (e, name) => {
-    this.setState({
-      [name]: e.target.value,
-    })
-  }
-  onKeyUp = (e) => {
+  const onKeyUp = (e) => {
     if (e.key === 'Enter') {
-      let min = Math.floor(this.state.min)
-      let sec = Math.floor(this.state.sec)
-      if (this.state.quest.trim() !== '' && min >= 0 && sec >= 0 && min + sec > 0 && sec < 60 && min < 60) {
-        const secTimer = min * 60 + sec
-        this.props.addTask(this.state.quest, secTimer)
+      let minFloor = Math.floor(min)
+      let secFloor = Math.floor(sec)
+      if (quest.trim() === '') {
+        setPlaceholder('Require to wright task')
+      } else if (minFloor + secFloor === 0) {
+        setPlaceholder('Require to set time')
+      } else if (minFloor < 0 || secFloor < 0) {
+        setPlaceholder('Wrong time')
+      } else if (secFloor > 60 || minFloor > 60) {
+        setPlaceholder('Max time - 59:59')
+      } else {
+        const secTimer = minFloor * 60 + secFloor
+        props.addTask(quest, secTimer)
+        setPlaceholder('Task')
       }
-      this.setState({
-        quest: '',
-        min: '',
-        sec: '',
-      })
+      setQuest('')
+      setMin('')
+      setSec('')
     }
   }
 
-  render() {
-    return (
-      <header className="header">
-        <h1>Enter = Submit</h1>
-        <form className="new-todo-form">
-          <input
-            className="new-todo"
-            placeholder="Task"
-            autoFocus
-            value={this.state.quest}
-            onChange={(e) => {
-              this.onChange(e, 'quest')
-            }}
-            onKeyUp={this.onKeyUp}
-          />
-          <input
-            className="new-todo-form__timer"
-            placeholder="Min"
-            // autoFocus
-            value={this.state.min}
-            onChange={(e) => {
-              this.onChange(e, 'min')
-            }}
-            onKeyUp={this.onKeyUp}
-            type={'number'}
-            min={0}
-            max={60}
-            step={1}
-          />
-          <input
-            className="new-todo-form__timer"
-            placeholder="Sec"
-            // autoFocus
-            value={this.state.sec}
-            onChange={(e) => {
-              this.onChange(e, 'sec')
-            }}
-            onKeyUp={this.onKeyUp}
-            type={'number'}
-            min={0}
-            max={60}
-            step={1}
-          />
-        </form>
-      </header>
-    )
-  }
+  return (
+    <header className="header">
+      <h1>Enter = Submit</h1>
+      <form className="new-todo-form">
+        <input
+          className="new-todo"
+          placeholder={placeholder}
+          autoFocus
+          value={quest}
+          onChange={(e) => {
+            onChange(e, setQuest)
+          }}
+          onKeyUp={onKeyUp}
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Min"
+          // autoFocus
+          value={min}
+          onChange={(e) => {
+            onChange(e, setMin)
+          }}
+          onKeyUp={onKeyUp}
+          type={'number'}
+          min={0}
+          max={59}
+          step={1}
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Sec"
+          // autoFocus
+          value={sec}
+          onChange={(e) => {
+            onChange(e, setSec)
+          }}
+          onKeyUp={onKeyUp}
+          type={'number'}
+          min={0}
+          max={59}
+          step={1}
+        />
+      </form>
+    </header>
+  )
 }
+
+NewTaskForm.defaultProps = {
+  addTask: () => {},
+}
+NewTaskForm.propTypes = {
+  addTask: (props, propName, componentName) => {
+    if (typeof props[propName] === 'function') return null
+    return new TypeError(`${componentName}: ${propName} must be function`)
+  },
+}
+
+export default NewTaskForm

@@ -1,8 +1,6 @@
 import React from 'react'
-// import ReactDOM from 'react-dom/client'
 
 import './TaskList.css'
-
 import Task from '../Task/Task'
 
 const TaskList = (props) => {

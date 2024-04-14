@@ -1,8 +1,6 @@
 import React from 'react'
-// import ReactDOM from 'react-dom/client'
 
 import './Footer.css'
-
 import TasksFilter from '../TasksFilter/TasksFilter'
 
 const Footer = (props) => {
