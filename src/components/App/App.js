@@ -6,16 +6,22 @@ import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import Footer from '../Footer/Footer'
 
 const App = () => {
-  let lastId = 0
+  const [nextId, setNextId] = useState(4)
 
   const genExTime = (ms) => {
     // делает дату на заданное количество ms позже
     return new Date(new Date().getTime() - ms)
   }
 
-  const createTask = (quest, secTimer, msPassed) => {
+  const createTask = (quest, secTimer, msPassed, id) => {
+    let newId = id
+    if (!newId) {
+      // console.log('newId')
+      newId = nextId
+      setNextId((s) => s + 1)
+    }
     return {
-      id: lastId++,
+      id: newId,
       quest: quest,
       creationData: msPassed ? genExTime(msPassed) : new Date(),
       secTimer: secTimer ? secTimer : 0,
@@ -25,15 +31,16 @@ const App = () => {
   }
 
   const [taskDataList, setTaskDataList] = useState([
-    createTask('fw', 2, 1000 * 17),
-    createTask('fw', 0, 1000 * 60 * 5),
-    createTask('fw', 12 * 60 + 25, 1000 * 60 * 5),
+    createTask('fw', 2, 1000 * 17, 1),
+    createTask('fw', 0, 1000 * 60 * 5, 2),
+    createTask('fw', 12 * 60 + 25, 1000 * 60 * 5, 3),
   ])
   const [activeFilter, setActiveFilter] = useState('All')
 
   // ---------------- timer
 
   const updateTimer = () => {
+    // console.log(taskDataList[2])
     const newTaskDataList = taskDataList.slice()
     newTaskDataList.map((val) => {
       if (val.isCounting) {
@@ -46,9 +53,10 @@ const App = () => {
   }
 
   useEffect(() => {
+    // console.log('hi')
     const interval = setInterval(updateTimer, 1000)
     return () => clearInterval(interval)
-  })
+  }, [taskDataList.length])
 
   // ---------------- forNewTaskForm
 
