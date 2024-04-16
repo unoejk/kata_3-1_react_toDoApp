@@ -6,22 +6,16 @@ import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import Footer from '../Footer/Footer'
 
 const App = () => {
-  const [nextId, setNextId] = useState(4)
+  const [nextId] = useState([1])
 
   const genExTime = (ms) => {
     // делает дату на заданное количество ms позже
     return new Date(new Date().getTime() - ms)
   }
 
-  const createTask = (quest, secTimer, msPassed, id) => {
-    let newId = id
-    if (!newId) {
-      // console.log('newId')
-      newId = nextId
-      setNextId((s) => s + 1)
-    }
+  const createTask = (quest, secTimer, msPassed) => {
     return {
-      id: newId,
+      id: nextId[0]++,
       quest: quest,
       creationData: msPassed ? genExTime(msPassed) : new Date(),
       secTimer: secTimer ? secTimer : 0,
@@ -31,32 +25,32 @@ const App = () => {
   }
 
   const [taskDataList, setTaskDataList] = useState([
-    createTask('fw', 2, 1000 * 17, 1),
-    createTask('fw', 0, 1000 * 60 * 5, 2),
-    createTask('fw', 12 * 60 + 25, 1000 * 60 * 5, 3),
+    createTask('fw', 2, 1000 * 17),
+    createTask('fw', 0, 1000 * 60 * 5),
+    createTask('fw', 12 * 60 + 25, 1000 * 60 * 5),
   ])
   const [activeFilter, setActiveFilter] = useState('All')
 
   // ---------------- timer
 
   const updateTimer = () => {
-    // console.log(taskDataList[2])
-    const newTaskDataList = taskDataList.slice()
-    newTaskDataList.map((val) => {
-      if (val.isCounting) {
-        val.secTimer--
-        if (val.secTimer === 0) val.isCounting = false
-      }
-      return val
+    setTaskDataList((s) => {
+      const newTaskDataList = s.slice()
+      newTaskDataList.map((val) => {
+        if (val.isCounting) {
+          val.secTimer--
+          if (val.secTimer === 0) val.isCounting = false
+        }
+        return val
+      })
+      return newTaskDataList
     })
-    setTaskDataList(newTaskDataList)
   }
 
   useEffect(() => {
-    // console.log('hi')
     const interval = setInterval(updateTimer, 1000)
     return () => clearInterval(interval)
-  }, [taskDataList.length])
+  }, [])
 
   // ---------------- forNewTaskForm
 
